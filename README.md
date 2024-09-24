@@ -12,8 +12,13 @@ Copy (or link) this script to /usr/lib/check_mk_agent/local/status_group.py
 Create a .env_uptime_kuma_stylite.py file in the same directory 
 with the following content:
 
+
 BASE_URL=https://your-uptime.kuma.url
+
 CHECK_MK_NAME=checkname
+
 API_KEY=uk_xxxxxxxxxxxxxxxxxxx
+
 WARN=677
+
 CRIT=1277
