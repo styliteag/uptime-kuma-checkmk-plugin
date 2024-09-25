@@ -5,6 +5,10 @@
 #
 # To installin check_mk_agent:
 # The Script can be installed on any host running the check_mk_agent
+#
+# apt install python3-dotenv python3-pip
+# pip install uptime-kuma-api --break-system-packages
+
 
 # Copy (or link) this script to /usr/lib/check_mk_agent/local/status_group.py
 #  ln -sf /opt/src/kuma-create-checks/checkmk_status_plugin.py /usr/lib/check_mk_agent/local/uptime_kuma_stylite.py
@@ -24,9 +28,6 @@ from uptime_kuma_api import UptimeKumaApi, MonitorType
 import requests
 import re
 
-# apt install python-dotenv
-# apt install python3-pip
-# pip install uptime-kuma-api --break-system-packages
 
 # Read a env file with the name of this script 
 dotenv_path = f".env_{os.path.basename(__file__)}"
@@ -45,7 +46,7 @@ if api_key is None:
   print("No API_KEY given")
   exit(1)
 
-check_mk_name = os.getenv("CHECK_MK_NAME", "kuma")
+check_mk_name = os.getenv("CHECK_MK_NAME", "")
 warn_default = int(os.getenv("WARN", 100))
 crit_default = int(os.getenv("CRIT", 200))
 
@@ -114,7 +115,8 @@ for line in response.text.split("\n"):
       my_response_cert_days[f"{monitor_name}-{monitor_type}"] = monitor_result
     
 # <<<< Says its piggyback for the host up-xxxxx
-print(f"<<<<up-{check_mk_name}>>>>")
+if check_mk_name != "":
+  print(f"<<<<{check_mk_name}>>>>")
 # Local:sep(0) is the separator
 print("<<<local:sep(0)>>>")
 for key in my_response_status:
@@ -216,5 +218,6 @@ for key in my_response_status:
     print(f"{status} \"{check_mk_name}:{key}-cert\" days_remaining={my_response_cert_days1};27;14 OK: url {my_response_url1}, cert is {my_response_cert1} {my_response_cert_days1} days remaining")
 
 # Switch to the original host
-print(f"<<<<>>>>")
+if check_mk_name != "":
+  print(f"<<<<>>>>")
 exit(0)
