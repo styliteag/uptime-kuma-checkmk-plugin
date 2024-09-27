@@ -22,6 +22,9 @@
 # # Optional WARN and CRIT in ms for response time (default 100ms and 200ms, can be overwritten by (999ms) in the monitor name)
 # WARN=677
 # CRIT=1277
+# Optional CERT_WARN_DAYS and CERT_CRIT_DAYS for certificate days remaining (default 27 and 14 days)
+# CERT_WARN_DAYS=27
+# CERT_CRIT_DAYS=14
  
 import os
 import json
@@ -52,6 +55,8 @@ check_mk_host = os.getenv("CHECK_MK_HOST", "")
 check_mk_prefix = os.getenv("CHECK_MK_PREFIX", "")
 warn_default = int(os.getenv("WARN", 100))
 crit_default = int(os.getenv("CRIT", 200))
+cert_warn_days = int(os.getenv("CERT_WARN_DAYS", 27))
+cert_crit_days = int(os.getenv("CERT_CRIT_DAYS", 14))
 
 # curl -u":uk3_xxxxxxxxx" https://up.stylite.io/metrics
 #print(f"Base URL: {base_url}")
@@ -220,13 +225,13 @@ for key in my_response_status:
   status = 0
   if my_response_cert1 != "unk":
     status = 1
-    if my_response_cert_days1 > 27:
+    if my_response_cert_days1 > cert_warn_days:
       status = 0
-    elif my_response_cert_days1 < 14:
+    elif my_response_cert_days1 < cert_crit_days:
       status = 2
     if my_response_cert1 == "INVALID":
       status = 2
-    print(f"{status} \"{friendly_name}-cert\" days_remaining={my_response_cert_days1};27;14 OK: url {my_response_url1}, cert is {my_response_cert1} {my_response_cert_days1} days remaining")
+    print(f"{status} \"{friendly_name}-cert\" days_remaining={my_response_cert_days1};{cert_warn_days};{cert_crit_days} OK: url {my_response_url1}, cert is {my_response_cert1} {my_response_cert_days1} days remaining")
 
 # Switch to the original host
 if check_mk_host != "":
