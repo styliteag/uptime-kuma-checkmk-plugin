@@ -25,6 +25,11 @@ with the following content:
 BASE_URL=https://your-uptime.kuma.url
 CHECK_MK_NAME=checkname
 API_KEY=uk_xxxxxxxxxxxxxxxxxxx
-WARN=677
-CRIT=1277
+# Optional Hostname (piggyback)
+# CHECK_MK_HOST=kuma-ext
+# Optional Prefix (e.g. "Kuma-Ext ")
+# CHECK_MK_PREFIX="Kuma-Ext "
+# # Optional WARN and CRIT in ms for response time (default 100ms and 200ms, can be overwritten by (999ms) in the monitor name)
+# WARN=677
+# CRIT=1277
 ```
