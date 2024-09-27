@@ -23,7 +23,6 @@ with the following content:
 ```
 # Put this in the .env file
 BASE_URL=https://your-uptime.kuma.url
-CHECK_MK_NAME=checkname
 API_KEY=uk_xxxxxxxxxxxxxxxxxxx
 # Optional Hostname (piggyback)
 # CHECK_MK_HOST=kuma-ext
