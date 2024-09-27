@@ -16,8 +16,10 @@
 # with the following content:
 #
 # BASE_URL=https://up.stylite.io
-# CHECK_MK_NAME=stylite
+# CHECK_MK_HOST=kuma-ext
+# CHECK_MK_PREFIX="Kuma-Ext "
 # API_KEY=uk_xxxxxxxxxxxxxxxxxxx
+# # Optional WARN and CRIT in ms for response time (default 100ms and 200ms, can be overwritten by (999ms) in the monitor name)
 # WARN=677
 # CRIT=1277
  
@@ -46,7 +48,8 @@ if api_key is None:
   print("No API_KEY given")
   exit(1)
 
-check_mk_name = os.getenv("CHECK_MK_NAME", "")
+check_mk_host = os.getenv("CHECK_MK_HOST", "")
+check_mk_prefix = os.getenv("CHECK_MK_PREFIX", "")
 warn_default = int(os.getenv("WARN", 100))
 crit_default = int(os.getenv("CRIT", 200))
 
@@ -115,8 +118,8 @@ for line in response.text.split("\n"):
       my_response_cert_days[f"{monitor_name}-{monitor_type}"] = monitor_result
     
 # <<<< Says its piggyback for the host up-xxxxx
-if check_mk_name != "":
-  print(f"<<<<{check_mk_name}>>>>")
+if check_mk_host != "":
+  print(f"<<<<{check_mk_host}>>>>")
 # Local:sep(0) is the separator
 print("<<<local:sep(0)>>>")
 for key in my_response_status:
@@ -162,6 +165,10 @@ for key in my_response_status:
   if key in my_response_type:
     my_response_type1 = my_response_type[key]
 
+  if my_response_type1 == "group":
+    # Skip groups in output
+    continue
+
   my_response_cert_days1=0
   if key in my_response_cert_days:
     my_response_cert_days1 = int(my_response_cert_days[key])
@@ -192,7 +199,11 @@ for key in my_response_status:
     status = 1              #  check_mk status 1 = WARN
   elif my_status == "3": # 3 = MAINTENANCE
     status = 3              # check_mk status 3 = UNKNOWN
-  print(f"{status} \"{check_mk_name}:{key}\" response_time={my_response_time_seconds};1;3 OK: {my_response_time1} ms, url {my_response_url1}, type {my_response_type1}")
+  friendly_name = key
+  if check_mk_prefix != "":
+    friendly_name = f"{check_mk_prefix}{key}"
+
+  print(f"{status} \"{friendly_name}\" response_time={my_response_time_seconds};1;3 OK: {my_response_time1} ms, url {my_response_url1}, type {my_response_type1}")
 
 
   status = 0
@@ -204,7 +215,7 @@ for key in my_response_status:
   
   if my_response_type1 != "group":
     if warn > 0:
-      print(f"{status} \"{check_mk_name}:{key}-responsetime\" {status_txt} OK: {my_response_time1} ms, url {my_response_url1}, type {my_response_type1}")
+      print(f"{status} \"{friendly_name}-responsetime\" {status_txt} OK: {my_response_time1} ms, url {my_response_url1}, type {my_response_type1}")
   
   status = 0
   if my_response_cert1 != "unk":
@@ -215,9 +226,10 @@ for key in my_response_status:
       status = 2
     if my_response_cert1 == "INVALID":
       status = 2
-    print(f"{status} \"{check_mk_name}:{key}-cert\" days_remaining={my_response_cert_days1};27;14 OK: url {my_response_url1}, cert is {my_response_cert1} {my_response_cert_days1} days remaining")
+    print(f"{status} \"{friendly_name}-cert\" days_remaining={my_response_cert_days1};27;14 OK: url {my_response_url1}, cert is {my_response_cert1} {my_response_cert_days1} days remaining")
 
 # Switch to the original host
-if check_mk_name != "":
+if check_mk_host != "":
+  # We need to switch back to the original host
   print(f"<<<<>>>>")
 exit(0)
