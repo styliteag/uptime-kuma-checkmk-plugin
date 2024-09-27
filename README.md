@@ -31,4 +31,7 @@ API_KEY=uk_xxxxxxxxxxxxxxxxxxx
 # # Optional WARN and CRIT in ms for response time (default 100ms and 200ms, can be overwritten by (999ms) in the monitor name)
 # WARN=677
 # CRIT=1277
-```
+# Optional CERT_WARN_DAYS and CERT_CRIT_DAYS for certificate days remaining (default 27 and 14 days)
+# CERT_WARN_DAYS=27
+# CERT_CRIT_DAYS=14
+ ```
